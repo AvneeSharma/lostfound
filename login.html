@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<head>
+<link rel="stylesheet" href="login.css">
+<!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"> -->
+<title>SignUp-SignIn</title>
+</head>
+<body>
+ <div class="login-signup" id="main">
+    <div class="sign-up">
+        <form action="#">
+            <h1>Create Account</h1>
+            <!-- <div class="social-login-signup">
+                <a href="https://www.facebook.com/r.php" class="social"><i class="fab fa-facebook-f"></i></a>
+                <a href=https://accounts.google.com/signup class="social"><i class="fab fa-google-plus-g"></i></a>
+                <a href="https://www.linkedin.com/signup"  class="social"><i class="fab fa-linkedin-in"></i></a>
+                
+            </div> -->
+            <!-- <p>or use your email for registration</p> -->
+            <input type="text" name="txt" placeholder="Name" required="" class="name">
+            <input type="email" name="email" placeholder="Email" required="" class="email">
+            <input type="password" name="pswd" placeholder="Password" required="" class="pswd">
+            <button>Sign Up</button>
+
+        </form>
+    </div>
+
+    <div class="sign-in">
+        <form action="#">
+            <h1>Sign in</h1>
+            <!-- <div class="social-login-signup">
+                <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+                
+            </div> -->
+            <!-- <p>or use your account</p> -->
+          
+            <input type="email" name="email" placeholder="Email" required="" class="email">
+            <input type="password" name="pswd" placeholder="Password" required="" class="pswd">
+            <a href="http://127.0.0.1:5500/forgetpass.html">Forget your Password?</a>
+            <button>Sign In</button>
+
+        </form>
+    </div>
+    
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-left">
+                <h1>Welcome Back</h1>
+                <p>To keep connected with us please login with your personal info</p>
+                <button id="signIn">Sign In</button>
+            </div>
+ 
+            <div class="overlay-right">
+                <h1>Hello, Friends</h1>
+                <p>Enter your personnal details and start journey with us</p>
+                <button id="signUp">Sign Up</button>
+            </div>
+
+        </div>
+    </div> 
+</div>
+<script type="text/javascript">
+    const signUpButton = document.getElementById('signUp');
+    const signInButton = document.getElementById('signIn');
+    const main = document.getElementById('main');
+ 
+    signUpButton.addEventListener('click',() => {
+        console.log('Sign Up button clicked');
+        main.classList.add("right-panel-active");
+    });
+    signInButton.addEventListener('click',() => {
+        main.classList.remove("right-panel-active");
+        console.log('Sign In button clicked');
+    });
+</script>
+</body>
+</html>
