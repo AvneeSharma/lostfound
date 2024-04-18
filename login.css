@@ -230,4 +230,8 @@ input{
     .email::placeholder{
         color:#004687;
     }
+
+    .contact::placeholder{
+        color:#004687;
+    }
     

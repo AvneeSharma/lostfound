@@ -163,14 +163,14 @@
   
   .navbar ul li a .text {
     position: absolute;
-    /* color:#E0FFFF; */
     color:rgb(6, 57, 84);
     font-weight: 400;
     font-size: 20px;
     text-align: center;
     transform: translateY(70px);
     transition: 0.5s;
-    opacity: 0;
+    opacity: 0; 
+    
   }
   
   .navbar ul li.active a .icon {

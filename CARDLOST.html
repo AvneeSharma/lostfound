@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
     
@@ -51,56 +50,49 @@
 
     <script>
     
-        
-        //const urlParams = new URLSearchParams(window.location.search);
-       // const data = urlParams.get("data");
-
-       
-      //  const cardData = JSON.parse(decodeURIComponent(data));
-
-
-      
-
-      //  const cardContainer = document.getElementById("cardContainer");
-
-      const cardData = JSON.parse(localStorage.getItem("cardDataa")) || [];
-const cardContainer = document.getElementById("cardContainer");
-
-// Clear the cardContainer before adding cards
-//cardContainer.innerHTML = '';
-
-// Create cards for each set of data
-cardData.forEach((item, index) => {
-  const card = document.createElement("div");
-  card.className = "card";
-
-  card.innerHTML = `
-    <img src="${item.image}" style="max-width: 100%; height: auto;">
-    <div class="container">
-      <p><i> <b>Name of item:</b> ${item.name_of_item}</p>
-     
-      <p> <b>Place where found:</b> ${item.select_place === "None" ? item.place : item.select_place}</p>
-      
-      <p><b> Description:</b> ${item.description}</p>
-      <p><b>Contact no. :</b> ${item.contact}</p>
-    </div>
-  `;
-
-  cardContainer.appendChild(card);
-});
-
-
-      
-
-
+    // Clear the cardContainer before adding cards
+     //cardContainer.innerHTML = '';
 
            // Clear the card data from local storage to avoid duplicates
-      //  localStorage.removeItem("cardData");
+        //localStorage.removeItem("cardData");
             
+      // <img src="${item.image}" style="max-width: 100%; height: auto;">
+
+            // Define the URL of your GET API
+        const apiUrl = 'http://localhost:3000/api/lost-items-card';
+
+        // Select the cardContainer element
+        const cardContainer = document.getElementById("cardContainer");
+
+        // Fetch data from the API
+        fetch(apiUrl)
+            .then(response => response.json()) // Parse response as JSON
+            .then(data => {
+                // Iterate through the retrieved data and create cards
+                data.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+console.log(item.show_contact);
+
+                    card.innerHTML = `
+                       
+                        <div class="container">
+                            <p><i><b>Name of Lost item:</b> ${item.name_of_item_lost || 'N/A'}</i></p>
+                            <p><b>Place where found:</b> ${item.select_place === "None" ? item.place : item.select_place}</p>
+                            <p><b>Description:</b> ${item.description}</p>
+                            
+                            ${item.show_contact ? `<p><b>Contact no. :</b> ${item.contact}</p>` : 'NA'}
+
+                        </div>
+                    `;
+
+                    cardContainer.appendChild(card); // Append card to the container
+                });
+            })
 
             
-       
-    
+            
+           
     </script>
 </body>
 </html>

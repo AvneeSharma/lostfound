@@ -159,208 +159,209 @@
             height:30px;
             width:100px;
         }
-
         
+       
+        input[type="checkbox"] {
+            /* Hide the default checkbox appearance */
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ccc; /* Border color for unchecked state */
+            border-radius: 4px;
+            outline: none;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-right: 10px; /* Adjust as needed */
+            margin-bottom: 20px;
+        }
+        
+        input[type="checkbox"]:checked {
+            /* Change background color for checked state */
+            background-color:white; /* Change to your desired color */
+        }
+        label {
+            font-size: 16px; /* Adjust as needed */
+            color: #333; /* Text color */
+            cursor: pointer;
+            display: inline-block;
+            vertical-align: middle;
+            margin-bottom: 18px;
+        }
     </style>
 </head>
 <body>
     <div class="wrapper">
         <div class="login-text">
-          <button class="cta"><i class="fas fa-chevron-down fa-1x"></i></button>
-          <div class="text"><b>Find what's lost!</b>
-            <!-- <a href="">Login</a> -->
-            <hr>
-            <form onclick="createCardAndResetForm()" >
-           <br>
-            <input type="text" name="txt" placeholder="Name of item Found" required="" class="input" height="30px" width="30px" id="name_of_item">
-            <br>
-            <select class="place" id="select_place" onchange="handlePlaceSelect()">
-                <option value="" disabled selected >Select a place</option>
-                <option value="jaggi" id="jaggi">jaggi</option>
-                <option value="cos" id="cos">Cos</option>
-                <option value="None" id="none">None</option>
-              </select>
-              <br>
-              <input type="text" name="place" placeholder="Place where item Found" class="input" id="place" required disabled >
-            <br>
-              <br>
-            <textarea id="textarea" rows="5" columns="10" placeholder="Description of item found" class="input" ></textarea>
-            <br>
-            <input type="file" id="image" name="image" accept="image/*" class="file" onchange="uploadImage(this.files[0])" >
-            <br>
-            <input type="text" name="txt" placeholder="Contact no." required="" class="input" id="contact" required >
-            <br>
-            <input type="submit" value="Submit" id="submit" onclick="createCard()"  >
-            <br>
-
-</form>
-
-
-
-            
-          </div>
+            <button class="cta"><i class="fas fa-chevron-down fa-1x"></i></button>
+            <div class="text"><b>Find what's lost!</b>
+                <hr>
+                <form id="lostpage" method="post">
+                    <br>
+                    <input type="text" name="txt" placeholder="Name of item Lost" required="" class="input" height="30px" width="30px" id="name_of_item">
+                    <br>
+                    <select class="place" id="select_place" onchange="handlePlaceSelect()">
+                        <option value="" disabled selected>Select a place</option>
+                        <option value="jaggi" id="jaggi">jaggi</option>
+                        <option value="cos" id="cos">Cos</option>
+                        <option value="None" id="none">None</option>
+                    </select>
+                    <br>
+                    <input type="text" name="place" placeholder="Place where item Lost" class="input" id="place" required disabled>
+                    <br>
+                    <br>
+                    <textarea id="textarea" rows="5" columns="10" placeholder="Description of item lost" class="input"></textarea>
+                    <!-- <input type="text" name="txt" placeholder="Contact no." required="" class="input" id="contact" required> -->
+                    <br>
+                    <p>Do you want to show your contact no.?</p>
+                    <input type="checkbox" name="yes" id="yesCheckbox" onclick="toggleCheckbox(this)">
+                    <label for="yesCheckbox">Yes</label>
+                  <input type="checkbox" name="no" id="noCheckbox" onclick="toggleCheckbox(this)">
+                  <label for="noCheckbox">No</label>
+                  <br>
+                    <input type="submit" value="Submit" id="submit">
+                    <br>
+                </form>
+            </div>
         </div>
         <div class="call-text">
-          
-          <h1>Lost? Don't fret, we'll help you find it.</h1>
-          <h3><i>Recover Lost Possessions...</i></h3>
+            <h1>Lost? Don't fret, we'll help you find it.</h1>
+            <h3><i>Recover Lost Possessions...</i></h3>
         </div>
-      
-      </div>
-     
+    </div>
 </body>
+
 <script>
-
-  
-
-    var cta = document.querySelector(".cta");
-var check = 0;
-
-cta.addEventListener('click', function(e){
-    var text = e.target.nextElementSibling;
-    var loginText = e.target.parentElement;
-    text.classList.toggle('show-hide');
-    loginText.classList.toggle('expand');
-    if(check == 0)
-    {
-        cta.innerHTML = "<i class=\"fas fa-chevron-up\"></i>";
-        check++;
-    }
-    else
-    {
-        cta.innerHTML = "<i class=\"fas fa-chevron-down\"></i>";
-        check = 0;
-    }
-})
-
-
-
-
-var cardData = []; // Array to store card data
-
-function createCard() {
-
-  if (!validateForm()) {
-    return; // Don't create the card if the form is invalid
-  }
-
-
- var name_of_item = document.getElementById("name_of_item").value;
-var select_place= document.getElementById("select_place").value;
-var description= document.getElementById("textarea").value;
-var image= document.getElementById("image").value;
-var contact= document.getElementById("contact").value;
-
-var place = document.getElementById("place").value;
-
-
-
-    
-
-      // Add the data to the cardData array
-  // cardData.push({ name_of_item, select_place, description, image, contact});
-
-    // Encode the values and send them as query parameters to the other webpage
-   var url = "CARDLOST.html?data=" + encodeURIComponent(JSON.stringify(cardData));
-   
-
-    // window.open(url, '_blank');
-
-    
-// window.open(url, '_blank');
-
-
-// Retrieve existing card data from local storage (if any)
-var existingCardData = JSON.parse(localStorage.getItem("cardDataa")) || [];
-
-// Add the new data to the existing data
-existingCardData.push({ name_of_item, select_place, description, image, contact,place });
-
-// Store the updated data in local storage
-localStorage.setItem("cardDataa", JSON.stringify(existingCardData));
-
-// Redirect to CARDFOUND.html
-// window.location.href = "CARDFOUND.html";
-
-
-
-    function validateForm() {
-     const nameOfItem = document.getElementById("name_of_item").value;
-      const contact = document.getElementById("contact").value;
-    
-    //   Check if "Name of item Found" is filled and "Contact no." is a positive 10-digit number
-      if (nameOfItem.trim() === '') {
-        alert("Please fill in 'Name of item Found'.");
-        return false; // Prevent form submission
+    function toggleCheckbox(checkbox) {
+        var otherCheckbox = checkbox.id === "yesCheckbox" ? "noCheckbox" : "yesCheckbox";
+        if (checkbox.checked) {
+          document.getElementById(otherCheckbox).checked = false;
+        }
       }
-    
-      if (!/^\d{10}$/.test(contact)) {
-        alert("Please provide a valid 10-digit positive number for 'Contact no.'.");
-        return false; // Prevent form submission
-      }
-    
-      // If both conditions are met, the form will be submitted
-     return true;
-    }
-
-
-    // Add an event listener to the form's submit button, and call the validateForm function
-document.getElementById("myForm").addEventListener("submit", function(event) {
-event.preventDefault(); // Prevent the form from submitting by default
-
-if (!validateForm()) {
-return; // If the form is invalid, don't submit it
-}
-
-// If the form is valid, submit it
-this.submit();
-
-});
-    return true;
-}
-
-
-
 
 function handlePlaceSelect() {
+        // Get the selected place from the dropdown list
+        const selectedPlace = document.getElementById("select_place").value;
 
-// Get the selected place from the dropdown list
-const selectedPlace = document.getElementById("select_place").value;
-
-// Check if the user has selected "None"
-if (selectedPlace === "None") {
-  // Enable the input field for the place name
-  document.getElementById("place").disabled = false;
-} else {
-  // Disable the input field for the place name
-  document.getElementById("place").disabled = true;
-}
-
-// Check if the user has selected a place or has written the name of the place in the input field
-const place = document.getElementById("place").value;
-//if (place === '') {
-  // The user has not selected a place
-//  alert("Please select a place or write the name of the place in the input field.");
-  //return;
-//}
-}
-//window.onload = handlePlaceSelect;
-
-function createCardAndResetForm() {
-    if (!validateForm()) {
-        return;
+        // Check if the user has selected "None"
+        if (selectedPlace === "None") {
+            // Enable the input field for the place name
+            document.getElementById("place").disabled = false;
+        } else {
+            // Disable the input field for the place name
+            document.getElementById("place").disabled = true;
+        }
     }
-    // Process the data here
 
-    // Reset the form
-    document.getElementById("myForm").reset();
+    document.addEventListener('DOMContentLoaded', function() {
 
-    alert("Your form has been submitted successfully.");
+        var cta = document.querySelector(".cta");
+        var check = 0;
 
-   
-}
-document.getElementById("myForm").addEventListener("submit", createCardAndResetForm);
+        cta.addEventListener('click', function(e) {
+            var text = e.target.nextElementSibling;
+            var loginText = e.target.parentElement;
+            text.classList.toggle('show-hide');
+            loginText.classList.toggle('expand');
+            if (check == 0) {
+                cta.innerHTML = "<i class=\"fas fa-chevron-up\"></i>";
+                check++;
+            } else {
+                cta.innerHTML = "<i class=\"fas fa-chevron-down\"></i>";
+                check = 0;
+            }
+        });
 
+        document.getElementById("select_place").addEventListener("change", handlePlaceSelect);
 
-  </script>
+        function validateForm() {
+            const nameOfItem = document.getElementById("name_of_item").value;
+            const contact = document.getElementById("contact").value;
+
+            // Check if "Name of item Found" is filled and "Contact no." is a positive 10-digit number
+            if (nameOfItem.trim() === '') {
+                alert("Please fill in 'Name of item Found'.");
+                return false; // Prevent form submission
+            }
+
+            if (!/^\d{10}$/.test(contact)) {
+                alert("Please provide a valid 10-digit positive number for 'Contact no.'.");
+                return false; // Prevent form submission
+            }
+
+            // If both conditions are met, the form will be submitted
+            return true;
+        }
+
+        function handlePlaceSelect() {
+            // Get the selected place from the dropdown list
+            const selectedPlace = document.getElementById("select_place").value;
+
+            // Check if the user has selected "None"
+            if (selectedPlace === "None") {
+                // Enable the input field for the place name
+                document.getElementById("place").disabled = false;
+            } else {
+                // Disable the input field for the place name
+                document.getElementById("place").disabled = true;
+            }
+        }
+
+        document.getElementById("lostpage").addEventListener('submit', async function(event) {
+            event.preventDefault();
+          
+            // Create user object
+            var user = {
+                name_of_item_lost: document.getElementById('name_of_item').value,
+                select_place: document.getElementById("select_place").value,
+                description: document.getElementById("textarea").value,
+                place: document.getElementById("place").value,
+                show_contact: document.getElementById("yesCheckbox").checked // Add checkbox status
+            };
+         //   if (user.select_place !== "None") {
+           //     delete user.place;}
+                console.log("place:",user.place);
+        
+            console.log(JSON.stringify(user)); // Log the request payload before sending
+
+        
+
+            try {
+                const response = await fetch("http://localhost:3000/api/lostpage", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(user)
+                });
+        
+                if (!response.ok) {
+                    throw new Error('Network response was not ok.');
+                }
+
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    console.log('Validation Error:', errorData);
+                    // Handle validation error, e.g., display error messages to the user
+                }
+                
+        
+                const data = await response.json(); // Parse the JSON response
+                console.log('Success:', data);
+                alert('Lost data input successfully!');
+                window.location.reload();
+                window.location.href="http://127.0.0.1:5501/CARDLOST.html";
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Lost data input failed. Please try again later.');
+            }
+            // Handle validation errors from the server response
+
+        });
+        
+    });
+
+</script>
+
 </html>
