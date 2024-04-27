@@ -9,8 +9,8 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const session = require('express-session');
 const multer = require('multer');
-const { escapeRegExpChars } = require('ejs/lib/utils');
-//const Upload = multer({ dest: 'uploads/' }); 
+
+
 
 app.use(cors());
 // Middleware
@@ -38,6 +38,19 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
+
+const Storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'founditems/'); // Specify the directory where uploaded files should be stored
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename
+    }
+});
+
+const Upload = multer({ storage: Storage });
+
+
 
   //API FOR SIGN UP
 app.post('/api/signup', async (req,res)=>{
@@ -67,15 +80,12 @@ app.post('/api/signup', async (req,res)=>{
             });
             if (existingUser) {
                 // User already exists
-                //return res.status(400).json({ error: `The ${existingUser.field} is already registered.` });
+                
                 return res.status(400).json({ exists: true, field: Object.keys(existingUser)[0] });
             }else {
 
-
             await usersCollection.insertOne(userDetails);
             
-
-            //res.status(201).send('User registered successfully');
             res.status(201).json({ message: 'User registered successfully' });
 
             console.log('User registered successfully');
@@ -94,7 +104,6 @@ connectdb()
         app.listen(PORT, () => {
             const db = client.db('project'); // Specify your database name
             const usersCollection = db.collection('LostFound'); // Specify your collection name
-            //console.log(Server is running on port ${PORT});
             console.log(usersCollection);
         });
     })
@@ -105,7 +114,7 @@ connectdb()
 
   
   //API FOR LOST PAGE
-app.post('/api/lostpage', upload.single('image'), async (req, res) => {
+app.post('/api/lostpage', upload.single('image'),async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ error: 'No file uploaded' });
@@ -245,19 +254,6 @@ app.get('/api/lost-items-card', async (req, res) => {
  //const lostItems = await  usersCollection.find({}, { projection: { _id: 0 } }).toArray();
  const lostItems = await  usersCollection.find({}, { projection: { _id: 0 } }).toArray();
  
-
- // Retrieve user's contact number from the session
- //console.log("user:",req.session.user);
- //const userContact = req.session.user ? req.session.user.contact : null;
- 
- 
-     // Modify the lost items to include user contact if available
-//    const modifiedLostItems = lostItems.map(item => ({
-//      ...item,
-//    contact: userContact ? userContact: 'NA'
-
-
-//  }));
     
     res.json(lostItems);
    
@@ -268,6 +264,131 @@ app.get('/api/lost-items-card', async (req, res) => {
     }
 });
 
+ //API FOR FOUND PAGE
+ app.post('/api/foundpage', Upload.single('image'),async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        // Destructure the fields directly from req.body
+       // const { name_of_item_lost, select_place, description,  place, show_contact  } = req.body;
+       const { name_of_item_found, select_place, description,  place, contact  } = req.body;
+
+       const imagePath = req.file.path; // Get the path of the uploaded image
+       
+      
+        console.log(req.body)
+       
+        // Check if all required fields are present
+        if (name_of_item_found && select_place && description ) {
+            // Assuming connectdb returns a MongoDB client
+            const client = await connectdb();
+            const db = client.db('project'); // Specify your database name
+            const usersCollection = db.collection('FoundPageForm'); // Specify your collection name
+
+            
+
+            // Create an object with the required fields
+            const foundDetails = {
+                name_of_item_found: name_of_item_found,
+                select_place: select_place,
+                description: description,
+                place: place,
+                //show_contact: show_contact
+                contact:contact,
+                image: imagePath // Store the image path in the database
+               
+            };
+            const foundDetails2= {
+                name_of_item_found: name_of_item_found,
+                select_place: select_place,
+                description: description,
+               // show_contact: show_contact
+                contact:contact,
+                image: imagePath // Store the image path in the database
+               
+            };
+
+           // console.log(lostDetails);
+            if(place=='undefined'){
+                await usersCollection.insertOne(foundDetails2);
+            }else{
+            // Insert the details into the database
+           await usersCollection.insertOne(foundDetails);
+
+        }
+
+            // Respond with success message
+            res.status(201).json({ message: 'Found data input successfully!' });
+            console.log('Found data input successfully!');
+        } else {
+            // If any required field is missing, respond with an error
+            res.status(400).json({ error: 'Missing required fields' });
+        
+            
+        }
+        
+    } catch (error) {
+        // If an error occurs, respond with a server error
+        console.error('Error Found data input failed.', error);
+        res.status(500).json({ error: 'Error Found data input failed. ' });
+    }
+});
+
+// GET API endpoint
+app.get('/api/found-items-card', async (req, res) => {
+    try {
+        // Assuming connectdb returns a MongoDB client
+        const client = await connectdb();
+        const db = client.db('project'); // Specify your database name
+        const usersCollection = db.collection('FoundPageForm'); // Specify your collection name
+
+        
+ // Query MongoDB for lost items
+ const foundItems = await  usersCollection.find({}, { projection: { _id: 0 } }).toArray();
+  
+    res.json(foundItems);
+   
+    } catch (error) {
+        // Handle error
+        res.status(500).json({ message: error.message });
+
+    }
+});
+
+
+//API FOR CONTACT US
+app.post('/api/contact', async (req,res)=>{
+
+    try {
+       // const { userDetails } = req.body;
+       const userDetails = req.body;
+    
+
+   console.log(userDetails);
+   
+        if (userDetails.name && userDetails.email && userDetails.subject && userDetails.message) {
+
+            // Assuming connectdb returns a MongoDB client
+            const client = await connectdb();
+            const db = client.db('project'); // Specify your database name
+            const usersCollection = db.collection('Contact'); // Specify your collection name
+
+            
+                
+                await usersCollection.insertOne(userDetails);
+                res.status(201).json({ message: 'User contacted successfully' });
+
+                console.log('User contacted successfully');
+            
+        } else {
+            res.status(400).json({ error: 'Missing required fields' });
+        }
+    } catch (error) {
+        console.error('Error contacting:', error);
+        res.status(500).json({ error: 'Error contacting' });
+    }
+});
 
 
 

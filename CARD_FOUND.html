@@ -126,19 +126,29 @@
             border: 1px solid #ccc;
             font-family: inherit;
           }  
+   .select_place{
+    width: 100%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 1px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+   }
+          
             
         </style>
       </head>
       <body>
-       <form id="myForm" onsubmit="return validateForm();" onclick="createCardAndResetForm();">
+       <form id="foundpage" method="post" enctype="multipart/form-data"">
         <div class="container" >
             <div class="top"></div>
             <div class="bottom"></div>
+            <button class="cta"><i class="fas fa-chevron-down fa-1x"></i></button>
             <div class="center">
                 <h2>Finders, Keepers, Seekers!</h2>
                 <input type="text" name="txt" placeholder="Name of item Found" required="" class="input" height="30px" width="30px" id="name_of_item">
 
-                <select class="place" id="select_place" onchange="handlePlaceSelect()">
+                <select class="select_place" id="select_place" onchange="handlePlaceSelect()">
                   <option value="" disabled selected >Select a place</option>
                   <option value="jaggi" id="jaggi">jaggi</option>
                   <option value="cos" id="cos">Cos</option>
@@ -149,12 +159,12 @@
 
                 <!-- <input type="text" placeholder="Place where item Found" name="place" class="input"> -->
                 <textarea id="textarea" rows="50" placeholder="Description of item found" class="input" ></textarea>
-                <input type="file" id="image" name="image" accept="image/*" class="file" onchange="uploadImage(this.files[0])" >
+                <input type="file" id="image" name="image" accept="image/*" class="file"  >
         
-                <input type="text" name="txt" placeholder="Contact no." required="" class="input" id="contact" required >
-                <input type="submit" value="Submit" id="submit" onclick="createCard()" >
+                <input type="tel" name="txt" placeholder="Contact no." required="" class="input" id="contact" required height="30px" width="30px" >
 
-                <h2>&nbsp;</h2>
+                <input type="submit" value="Submit" id="submit">
+                
                 
                 
             </div>
@@ -164,125 +174,134 @@
       
         <script>
         
-          var cardData = []; // Array to store card data
-
-      function createCard() {
-
-        if (!validateForm()) {
-          return; // Don't create the card if the form is invalid
-        }
-
-
-       var name_of_item = document.getElementById("name_of_item").value;
-      var select_place= document.getElementById("select_place").value;
-    var description= document.getElementById("textarea").value;
- var image= document.getElementById("image").value;
-  var contact= document.getElementById("contact").value;
-
-  var place = document.getElementById("place").value;
-
-
-
-          
-
-            // Add the data to the cardData array
-        // cardData.push({ name_of_item, select_place, description, image, contact});
-
-          // Encode the values and send them as query parameters to the other webpage
-         var url = "CARDFOUND.html?data=" + encodeURIComponent(JSON.stringify(cardData));
-         
-
-           window.open(url, '_blank');
-
-          
-   // window.open(url, '_blank');
-  
-
-   // Retrieve existing card data from local storage (if any)
-  var existingCardData = JSON.parse(localStorage.getItem("cardData")) || [];
-
-  // Add the new data to the existing data
-  existingCardData.push({ name_of_item, select_place, description, image, contact,place });
-
-  // Store the updated data in local storage
-  localStorage.setItem("cardData", JSON.stringify(existingCardData));
-
-  // Redirect to CARDFOUND.html
- // window.location.href = "CARDFOUND.html";
-
-
-
-          function validateForm() {
-            const nameOfItem = document.getElementById("name_of_item").value;
-            const contact = document.getElementById("contact").value;
-          
-            // Check if "Name of item Found" is filled and "Contact no." is a positive 10-digit number
-            if (nameOfItem.trim() === '') {
-              alert("Please fill in 'Name of item Found'.");
-              return false; // Prevent form submission
-            }
-          
-            if (!/^\d{10}$/.test(contact)) {
-              alert("Please provide a valid 10-digit positive number for 'Contact no.'.");
-              return false; // Prevent form submission
-            }
-          
-            // If both conditions are met, the form will be submitted
-            return true;
-          }
-
-
-          // Add an event listener to the form's submit button, and call the validateForm function
-document.getElementById("myForm").addEventListener("submit", function(event) {
-  event.preventDefault(); // Prevent the form from submitting by default
-
-  if (!validateForm()) {
-    return; // If the form is invalid, don't submit it
-  }
-
-  // If the form is valid, submit it
-  this.submit();
-});
+          function handlePlaceSelect() {
+            // Get the selected place from the dropdown list
+            const selectedPlace = document.getElementById("select_place").value;
     
-
-
-
-
-          return true;
-    }
-
-    function handlePlaceSelect() {
- 
-      // Get the selected place from the dropdown list
-      const selectedPlace = document.getElementById("select_place").value;
-      
-      // Check if the user has selected "None"
-      if (selectedPlace === "None") {
-        // Enable the input field for the place name
-        document.getElementById("place").disabled = false;
-      } else {
-        // Disable the input field for the place name
-        document.getElementById("place").disabled = true;
-      }
-      
-      // Check if the user has selected a place or has written the name of the place in the input field
-      const place = document.getElementById("place").value;
-      //if (place === '') {
-        // The user has not selected a place
-      //  alert("Please select a place or write the name of the place in the input field.");
-        //return;
-      //}
-      }
-      //window.onload = handlePlaceSelect;
-      
-      function createCardAndResetForm() {
-        if (!validateForm()) {
-            return;
+            // Check if the user has selected "None"
+            if (selectedPlace === "None") {
+                // Enable the input field for the place name
+                document.getElementById("place").disabled = false;
+            } else {
+                // Disable the input field for the place name
+                document.getElementById("place").disabled = true;
+            }
         }
     
-        // Reset the form
-        document.getElementById("myForm").reset();
-    }
+        document.addEventListener('DOMContentLoaded', function() {
+    
+            var cta = document.querySelector(".cta");
+            var check = 0;
+    
+            cta.addEventListener('click', function(e) {
+                var text = e.target.nextElementSibling;
+                var loginText = e.target.parentElement;
+                text.classList.toggle('show-hide');
+                loginText.classList.toggle('expand');
+                if (check == 0) {
+                    cta.innerHTML = "<i class=\"fas fa-chevron-up\"></i>";
+                    check++;
+                } else {
+                    cta.innerHTML = "<i class=\"fas fa-chevron-down\"></i>";
+                    check = 0;
+                }
+            });
+    
+            document.getElementById("select_place").addEventListener("change", handlePlaceSelect);
+    
+            function validateForm() {
+                const nameOfItem = document.getElementById("name_of_item").value;
+                const contact = document.getElementById("contact").value;
+    
+                // Check if "Name of item Found" is filled and "Contact no." is a positive 10-digit number
+                if (nameOfItem.trim() === '') {
+                    alert("Please fill in 'Name of item Found'.");
+                    return false; // Prevent form submission
+                }
+    
+                if (!/^\d{10}$/.test(contact)) {
+                    alert("Please provide a valid 10-digit positive number for 'Contact no.'.");
+                    return false; // Prevent form submission
+                }
+    
+                // If both conditions are met, the form will be submitted
+                return true;
+            }
+    
+            function handlePlaceSelect() {
+                // Get the selected place from the dropdown list
+                const selectedPlace = document.getElementById("select_place").value;
+    
+                // Check if the user has selected "None"
+                if (selectedPlace === "None") {
+                    // Enable the input field for the place name
+                    document.getElementById("place").disabled = false;
+                } else {
+                    // Disable the input field for the place name
+                    document.getElementById("place").disabled = true;
+                }
+            }
+    
+            document.getElementById("foundpage").addEventListener('submit', async function(event) {
+                event.preventDefault();
+    
+                // Get other form data
+        const formData = new FormData();
+        formData.append('name_of_item_found', document.getElementById('name_of_item').value);
+        formData.append('select_place', document.getElementById('select_place').value);
+        formData.append('description', document.getElementById('textarea').value);
+        formData.append('place', document.getElementById('place').value);
+        formData.append('contact', document.getElementById('contact').value);
+        // Append the image file to the form data
+        formData.append('image', document.getElementById('image').files[0]);
+    
+        console.log(formData);
+    
+                // Validate the form before submitting
+                if (validateForm()) {
+                    console.log("Form validation passed. Submitting form...");
+                    // Form submission logic here
+             
+                try {
+                    const response = await fetch("http://localhost:3000/api/foundpage", {
+                        method: 'POST',
+                        headers: {
+                            //'Content-Type': 'application/json'
+                            //'Content-Type': 'multipart/form-data'
+                        },
+                        //body: JSON.stringify(user)
+                       body:formData
+                     
+                    });
+            
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok.');
+                    }
+    
+                    if (response.status === 400) {
+                        const errorData = await response.json();
+                        console.log('Validation Error:', errorData);
+                        // Handle validation error, e.g., display error messages to the user
+                    }
+                    
+            
+                    const data = await response.json(); // Parse the JSON response
+                    console.log('Success:', data);
+                    alert('Found data input successfully!');
+                    window.location.reload();
+                 //   window.location.href="http://127.0.0.1:5501/CARDFOUND.html";
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Found data input failed. Please try again later.');
+                }
+            } else {
+                console.log("Form validation failed. Form not submitted.");
+            }
+                // Handle validation errors from the server response
+    
+            });
+            
+        });
     
   
     </script>

@@ -201,7 +201,7 @@
                     <br>
                     <input type="text" name="txt" placeholder="Name of item Lost" required="" class="input" height="30px" width="30px" id="name_of_item">
                     <br>
-                    <select class="place" id="select_place" onchange="handlePlaceSelect()">
+                    <select class="select_place" id="select_place" onchange="handlePlaceSelect()">
                         <option value="" disabled selected>Select a place</option>
                         <option value="jaggi" id="jaggi">jaggi</option>
                         <option value="cos" id="cos">Cos</option>
@@ -318,6 +318,7 @@ function handlePlaceSelect() {
     formData.append('name_of_item_lost', document.getElementById('name_of_item').value);
     formData.append('select_place', document.getElementById('select_place').value);
     formData.append('description', document.getElementById('textarea').value);
+    formData.append('place', document.getElementById('place').value);
     formData.append('contact', document.getElementById('contact').value);
     // Append the image file to the form data
     formData.append('image', document.getElementById('image').files[0]);
@@ -351,7 +352,7 @@ function handlePlaceSelect() {
                     method: 'POST',
                     headers: {
                         //'Content-Type': 'application/json'
-                        'Content-Type': 'multipart/form-data'
+                        //'Content-Type': 'multipart/form-data'
                     },
                     //body: JSON.stringify(user)
                    body:formData

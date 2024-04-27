@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -102,30 +102,75 @@
         <label for="message"><i class="fas fa-comments"></i><i> Message:</i></label>
         <textarea id="message" name="message" rows="4" required></textarea>
 
-        <button type="button" onclick="sendMessage()">Send Message </button>
+        <button type="submit" onclick="sendMessage()" id="button">Send Message </button>
     </form>
     <img src="https://static.vecteezy.com/system/resources/thumbnails/020/804/109/small/communication-and-technology-concept-hand-putting-wooden-block-cube-symbol-telephone-email-address-website-page-contact-us-or-e-mail-marketing-contact-us-in-customer-support-concept-photo.jpg" alt="Right Image" class="right-image">
 </div>
 
 <script>
     function sendMessage() {
+                  
+    const contactForm = document.getElementById('contactForm');
+    
+    contactForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+    
         var name = document.getElementById('name').value;
         var email = document.getElementById('email').value;
+        var subject = document.getElementById('subject').value;
+        var message = document.getElementById('message').value;
         
-        if (name.trim() === '' && email.trim() === '') {
-            alert('Please fill in the Name and Email fields.');
-        } 
-        else if (name.trim() === '') {
-            alert('Please fill in the Name field.');
-        }
-        else if (email.trim() === '') {
-            alert('Please fill in the Email field.');
+        if (name.trim() === '' || email.trim() === '' || subject.trim() === '' || message.trim() === '') {
+            alert('Please fill in all the fields.');
+            return; // Stop further execution if any field is empty
         }
         else {
-            // You can add your logic here to handle the form submission, e.g., sending an email or storing the data.
-            alert('Message sent!');
+    // Regular expression for email validation
+    var regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) {
+        alert('Invalid Email address');
+        return; // Stop further execution if email is invalid
+    }
+        try {
+            // Create user object
+        var User = {
+            name: name,
+            email: email,
+            subject: subject,
+            message: message
+        };
+            // Send user data to backend using fetch API
+            const response = await fetch('http://localhost:3000/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(User)
+            });
+           
+            if (response.ok) {
+                
+                alert('User contacted successfully!');
+                window.location.reload();
+                
+            } else {
+                // If sign-in fails, redirect to the homepage with a failure parameter
+              // window.location.reload();
+                throw new Error('Network response was not ok.');
+                
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Contacting failed.');
         }
     }
+    });
+    
+    
+}
+    
+    
+
 </script>
 <script src="https://kit.fontawesome.com/7a820b96d4.js" crossorigin="anonymous"></script>
 </body>
