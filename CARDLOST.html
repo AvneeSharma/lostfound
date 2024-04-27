@@ -45,9 +45,6 @@
 
     </div>
 
-    
-    
-
     <script>
     
     // Clear the cardContainer before adding cards
@@ -63,35 +60,57 @@
 
         // Select the cardContainer element
         const cardContainer = document.getElementById("cardContainer");
+        const requestOptions = {
+            method: 'GET', // or 'POST', 'PUT', etc.
+            headers: {
+                'Content-Type': 'application/json' // specify the Content-Type header
+            }
+        };
 
         // Fetch data from the API
-        fetch(apiUrl)
-            .then(response => response.json()) // Parse response as JSON
+        fetch(apiUrl,requestOptions)
+           // .then(response => response.json()) // Parse response as JSON
+           .then(response => {
+            console.log('Response:', response); // Log the response
+            return response.json(); // Parse response as JSON
+
+        })
             .then(data => {
+                console.log(data); 
+
                 // Iterate through the retrieved data and create cards
+
+
                 data.forEach(item => {
+                    
+                    console.log('Processing item:', item); // Log each item being processed
+
                     const card = document.createElement("div");
                     card.className = "card";
-console.log(item.show_contact);
+
 
                     card.innerHTML = `
-                       
+                    <img src="${item.image}" style="max-width: 100%; height: auto;">
                         <div class="container">
                             <p><i><b>Name of Lost item:</b> ${item.name_of_item_lost || 'N/A'}</i></p>
-                            <p><b>Place where found:</b> ${item.select_place === "None" ? item.place : item.select_place}</p>
+                            
+                            <p><b>Place where found:</b> ${item.select_place === "None" ? item.place || 'N/A' : item.select_place}</p>
                             <p><b>Description:</b> ${item.description}</p>
                             
-                            ${item.show_contact ? `<p><b>Contact no. :</b> ${item.contact}</p>` : 'NA'}
+                            <p><b>Contact:</b> ${item.contact}</p>
+                           
 
                         </div>
                     `;
 
                     cardContainer.appendChild(card); // Append card to the container
                 });
+           
             })
 
             
-            
+            // ${item.show_contact ? `<p><b>Contact no. :</b> ${item.contact}</p>` : 'NA'}
+            //<p><b>Place where found:</b> ${item.select_place === "None" ? item.place : item.select_place}</p>
            
     </script>
 </body>

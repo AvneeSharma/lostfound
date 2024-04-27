@@ -197,7 +197,7 @@
             <button class="cta"><i class="fas fa-chevron-down fa-1x"></i></button>
             <div class="text"><b>Find what's lost!</b>
                 <hr>
-                <form id="lostpage" method="post">
+                <form id="lostpage" method="post" enctype="multipart/form-data">
                     <br>
                     <input type="text" name="txt" placeholder="Name of item Lost" required="" class="input" height="30px" width="30px" id="name_of_item">
                     <br>
@@ -214,11 +214,13 @@
                     <textarea id="textarea" rows="5" columns="10" placeholder="Description of item lost" class="input"></textarea>
                     <!-- <input type="text" name="txt" placeholder="Contact no." required="" class="input" id="contact" required> -->
                     <br>
-                    <p>Do you want to show your contact no.?</p>
-                    <input type="checkbox" name="yes" id="yesCheckbox" onclick="toggleCheckbox(this)">
-                    <label for="yesCheckbox">Yes</label>
-                  <input type="checkbox" name="no" id="noCheckbox" onclick="toggleCheckbox(this)">
-                  <label for="noCheckbox">No</label>
+                    <!-- <p>Do you want to show your contact no.?</p> -->
+                    <!-- <input type="checkbox" name="yes" id="yesCheckbox" onclick="toggleCheckbox(this)"> -->
+                    <!-- <label for="yesCheckbox">Yes</label> -->
+                  <!-- <input type="checkbox" name="no" id="noCheckbox" onclick="toggleCheckbox(this)"> -->
+                  <!-- <label for="noCheckbox">No</label> -->
+                  <input type="file" id="image" name="image" accept="image/*" class="file"  >
+                  <input type="tel" name="contact" placeholder="Contact" required="" class="contact" id="contact">
                   <br>
                     <input type="submit" value="Submit" id="submit">
                     <br>
@@ -233,12 +235,12 @@
 </body>
 
 <script>
-    function toggleCheckbox(checkbox) {
-        var otherCheckbox = checkbox.id === "yesCheckbox" ? "noCheckbox" : "yesCheckbox";
-        if (checkbox.checked) {
-          document.getElementById(otherCheckbox).checked = false;
-        }
-      }
+    //function toggleCheckbox(checkbox) {
+      //  var otherCheckbox = checkbox.id === "yesCheckbox" ? "noCheckbox" : "yesCheckbox";
+        //if (checkbox.checked) {
+          //document.getElementById(otherCheckbox).checked = false;
+        //}
+     // }
 
 function handlePlaceSelect() {
         // Get the selected place from the dropdown list
@@ -310,6 +312,23 @@ function handlePlaceSelect() {
 
         document.getElementById("lostpage").addEventListener('submit', async function(event) {
             event.preventDefault();
+
+            // Get other form data
+    const formData = new FormData();
+    formData.append('name_of_item_lost', document.getElementById('name_of_item').value);
+    formData.append('select_place', document.getElementById('select_place').value);
+    formData.append('description', document.getElementById('textarea').value);
+    formData.append('contact', document.getElementById('contact').value);
+    // Append the image file to the form data
+    formData.append('image', document.getElementById('image').files[0]);
+
+    console.log(formData);
+
+            // Validate the form before submitting
+            if (validateForm()) {
+                console.log("Form validation passed. Submitting form...");
+                // Form submission logic here
+            
           
             // Create user object
             var user = {
@@ -317,23 +336,26 @@ function handlePlaceSelect() {
                 select_place: document.getElementById("select_place").value,
                 description: document.getElementById("textarea").value,
                 place: document.getElementById("place").value,
-                show_contact: document.getElementById("yesCheckbox").checked // Add checkbox status
+               // show_contact: document.getElementById("yesCheckbox").checked // Add checkbox status
+               contact:document.getElementById("contact").value,
+               image: document.getElementById('image')
             };
          //   if (user.select_place !== "None") {
            //     delete user.place;}
                 console.log("place:",user.place);
         
             console.log(JSON.stringify(user)); // Log the request payload before sending
-
-        
-
+         
             try {
                 const response = await fetch("http://localhost:3000/api/lostpage", {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        //'Content-Type': 'application/json'
+                        'Content-Type': 'multipart/form-data'
                     },
-                    body: JSON.stringify(user)
+                    //body: JSON.stringify(user)
+                   body:formData
+                 
                 });
         
                 if (!response.ok) {
@@ -356,6 +378,9 @@ function handlePlaceSelect() {
                 console.error('Error:', error);
                 alert('Lost data input failed. Please try again later.');
             }
+        } else {
+            console.log("Form validation failed. Form not submitted.");
+        }
             // Handle validation errors from the server response
 
         });

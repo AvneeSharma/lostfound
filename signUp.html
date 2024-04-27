@@ -92,11 +92,16 @@
                 }
             })
             .then(data => {
+                if (data.exists) {
+                    // User already exists, show alert box with details
+                    alert(`User with the following ${data.field} is already registered.`);
+                   
+                }else {
                 console.log('Success:', data);
                 alert('User registered successfully!');
                 window.location.reload();
                 window.location.href = 'http://127.0.0.1:5501/signIn.html';
-            
+                }
 
             })
             .catch((error) => {
@@ -137,20 +142,47 @@
     }
 
     function validatePassword(password) {
-       // const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,15}$/;
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[^\s]{8,15}$/
-        if (!regex.test(password)) {
-            alert("Password must meet the criteria");
-            alert("Password must be between 8 and 15 characters");
-            alert("Password must contain at least one uppercase letter");
-            alert("Password must contain at least one lowercase letter");
-            alert("Password must contain at least one digit");
-           alert ("Password must contain at least one special character");
-            alert("Password must not contain whitespace characters");
-            return false;
-        }
-        return true;
+      
+        let errorMessage = ""; // Initialize an empty error message
+
+            // Validate password criteria
+            if (password.length < 8 || password.length > 15) {
+                errorMessage += "Password must be between 8 and 15 characters.\n";
+            }
+            if (!/[a-z]/.test(password)) {
+                errorMessage += "Password must contain at least one lowercase letter.\n";
+            }
+            if (!/[A-Z]/.test(password)) {
+                errorMessage += "Password must contain at least one uppercase letter.\n";
+            }
+            if (!/\d/.test(password)) {
+                errorMessage += "Password must contain at least one digit.\n";
+            }
+            if (!/[@$!%*?&]/.test(password)) {
+                errorMessage += "Password must contain at least one special character.\n";
+            }
+            if (/\s/.test(password)) {
+                errorMessage += "Password must not contain whitespace characters.\n";
+            }
+
+            // Display the accumulated error message, if any
+            if (errorMessage !== "") {
+                alert(errorMessage);
+                return false; // Password is invalid
+            }
+            return true; // Password is valid
     }
+
+    window.addEventListener('pageshow', function(event) {
+        var historyTraversal = event.persisted || 
+                               (typeof window.performance != 'undefined' && 
+                                window.performance.navigation.type === 2);
+        if (historyTraversal) {
+
+            // Reload the page to ensure it's refreshed when navigated back
+            window.location.reload();
+        }
+    });
 });
   
 
