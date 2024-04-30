@@ -27,7 +27,8 @@ app.use(session({
     saveUninitialized: true
   }));
 
-  // Set up multer for file uploads
+  
+// Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'uploads/'); // Specify the directory where uploaded files should be stored
@@ -36,7 +37,6 @@ const storage = multer.diskStorage({
         cb(null, Date.now() + '-' + file.originalname); // Generate a unique filename
     }
 });
-
 const upload = multer({ storage: storage });
 
 const Storage = multer.diskStorage({
@@ -124,6 +124,7 @@ app.post('/api/lostpage', upload.single('image'),async (req, res) => {
        const { name_of_item_lost, select_place, description,  place, contact  } = req.body;
 
        const imagePath = req.file.path; // Get the path of the uploaded image
+
        
       
         
@@ -390,6 +391,84 @@ app.post('/api/contact', async (req,res)=>{
     }
 });
 
+app.get('/api/profile.html', async (req, res) => {
+    try {
+        const client = await connectdb();
+        const db = client.db('project');
+        const usersCollection = db.collection('LostFound');
+        const lostItemsCollection = db.collection('LostPageForm');
+        const foundItemsCollection = db.collection('FoundPageForm');
 
+        // Extract the useremail parameter from the query string
+        const userEmail = req.query.useremail;
 
+        // Find the user profile based on the email parameter
+        const userProfile = await usersCollection.findOne({ email: userEmail });
+
+        if (userProfile) {
+            const lostItems = await lostItemsCollection.find({ contact: userProfile.contact }).toArray();
+            const foundItems = await foundItemsCollection.find({ contact: userProfile.contact }).toArray();
+            res.json({ user: userProfile, lostItems: lostItems, foundItems: foundItems });
+        } else {
+            res.status(404).json({ error: 'User not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching user profile:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Delete a lost item
+app.delete('/api/lost-items/:id', async (req, res) => {
+    const itemId = req.params.id;
+    const client = await connectdb();
+    const db = client.db('project');
+    const collection = db.collection('LostPageForm');
+    try {
+        const result = await collection.deleteOne({ _id: itemId });
+        if (result.deletedCount === 1) {
+            res.status(200).json({ message: 'Lost item deleted successfully' });
+        } else {
+            res.status(404).json({ error: 'Lost item not found' });
+        }
+    } catch (error) {
+        console.error('Error deleting lost item:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    } finally {
+        await client.close();
+    }
+});
+
+app.get('/api/lost-items/search', async (req, res) => {
+    const { name } = req.query;
+    try {
+        const client = await connectdb();
+        const db = client.db('project');
+        const collection = db.collection('name_of_item_lost_1');
+        const searchResults = await collection.find({ _id: name }).toArray();
+        res.json(searchResults);
+    } catch (error) {
+        console.error('Error searching lost items:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/found-items/search', async (req, res) => {
+    const { name } = req.query;
+    try {
+        const client = await connectdb();
+        const db = client.db('project');
+        const collection = db.collection('name_of_item_found_1');
+
+        // Find search results
+        const searchResults = await collection.find({ _id: name }).toArray();
+
+        // Respond with search results
+        res.json(searchResults);
+    } catch (error) {
+        // Handle errors
+        console.error('Error searching lost items:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 

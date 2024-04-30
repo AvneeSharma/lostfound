@@ -58,13 +58,11 @@
     <h1><i>LostPage: Reuniting lost items with their owners, one click at a time!</i></h1>
     
     <div class="search-container">
-        <input type="text" class="search-box" placeholder="Search...">
+        <input type="text" class="search-box" id="searchInput" placeholder="Search...">
+        <button onclick="searchLostItems()">Search</button>
     </div>
 
-
-    <div class="cardcontainer" id="cardContainer"> <!-- Add this div to hold the generated cards -->
-        <img id="uploadedImage" style="max-width: 100%; height: auto;">
-    </div>
+    <div class="cardcontainer" id="cardContainer"></div>
 
  
     <script>
@@ -133,6 +131,57 @@
            
             })
 
+
+
+            function searchLostItems() {
+            const searchTerm = document.getElementById("searchInput").value;
+            const apiUrl = `http://localhost:3000/api/lost-items/search?name=${searchTerm}`;
+            
+            // Fetch data from the API
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    displaySearchResults(data); // Call the function to display search results
+                })
+                .catch(error => {
+                    console.error('Error fetching search results:', error);
+                });
+        }
+
+        // Function to display search results
+function displaySearchResults(searchResults) {
+    // Select the cardContainer element
+    const cardContainer = document.getElementById("cardContainer");
+
+    // Clear the cardContainer before adding cards
+    cardContainer.innerHTML = '';
+
+    // Iterate through the search results and create card elements
+    searchResults.forEach(group => {
+        group.items.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            card.innerHTML = `
+                <img src="${item.image}" style="max-width: 100%; height: 50%;width:50%;">
+                <div class="container">
+                    <p><b>Name of Lost item:</b> ${item.name_of_item_lost || 'N/A'}</p>
+                    <p><b>Place where found:</b> ${item.select_place || item.place || 'N/A'}</p>
+                    <p><b>Description:</b> ${item.description || 'N/A'}</p>
+                    <p><b>Contact:</b> ${item.contact || 'N/A'}</p>
+                </div>
+            `;
+
+            cardContainer.appendChild(card); // Append card to the container
+        });
+    });
+
+    // Check if search results are empty and display a message if so
+    if (searchResults.length === 0) {
+        cardContainer.innerHTML = '<p>No search results found</p>';
+    }
+}
             
             // ${item.show_contact ? `<p><b>Contact no. :</b> ${item.contact}</p>` : 'NA'}
             //<p><b>Place where found:</b> ${item.select_place === "None" ? item.place : item.select_place}</p>

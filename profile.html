@@ -76,9 +76,9 @@
                 </div>
         <div class="profile-info">
             <h2>User Profile</h2>
-            <p><strong>Name:</strong> John Doe</p>
-            <p><strong>Email:</strong> john@example.com</p>
-            <p><strong>Contact Number:</strong> +1234567890</p>
+            <p><strong>Name:</strong> <span id='user-name'></span></p>
+            <p><strong>Email:</strong> <span id='user-email'></span></p>
+            <p><strong>Contact Number:</strong> <span id='user-contact'></span></p>
         </div>
         </div>
     
@@ -86,44 +86,114 @@
 </div>
 </div>
         <div class="container">
-        <div class="items-column" id="lost-items">
-            <h2>Lost Items</h2>
-            <div class="item">
-                <img src="lost-item1.jpg" alt="Lost Item 1">
-                <span>Lost Item 1</span>
-                <span class="delete-btn" onclick="deleteLostItem(this)">Delete</span>
+            <div class="items-column" id="lost-items">
+                <!-- Lost items will be displayed here -->
             </div>
-            <div class="item">
-                <img src="lost-item2.jpg" alt="Lost Item 2">
-                <span>Lost Item 2</span>
-                <span class="delete-btn" onclick="deleteLostItem(this)">Delete</span>
+            <div id="found-items" class="items-column">
+                <!-- Found items will be displayed here -->
             </div>
         </div>
-        <div class="items-column" id="found-items">
-            <h2>Found Items</h2>
-            <div class="item">
-                <img src="found-item1.jpg" alt="Found Item 1">
-                <span>Found Item 1</span>
-                <span class="delete-btn" onclick="deleteFoundItem(this)">Delete</span>
-            </div>
-            <div class="item">
-                <img src="found-item2.jpg" alt="Found Item 2">
-                <span>Found Item 2</span>
-                <span class="delete-btn" onclick="deleteFoundItem(this)">Delete</span>
-            </div>
-        </div>
+
     </div>
 
     <script>
-        function deleteLostItem(element) {
-            element.parentNode.remove();
-            // Add logic here to delete the item from the backend
+
+        async function fetchUserProfile() {
+            let urlParams = new URLSearchParams(window.location.search);
+            let userEmail = urlParams.get('useremail');
+
+            if (userEmail) {
+                try {
+                    // Fetch user profile data from the backend using the email
+                    const response = await fetch(`http://localhost:3000/api/profile.html?useremail=${userEmail}`);
+                    if (response.ok) {
+                        const userData = await response.json();
+                        console.log(userData);
+                        displayUserProfile(userData);
+                    } else {
+                        console.error('Error fetching user profile:', response.status);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user profile:', error);
+                }
+            } else {
+                console.error('User email not found in URL.');
+            }
         }
 
-        function deleteFoundItem(element) {
-            element.parentNode.remove();
-            // Add logic here to delete the item from the backend
+function displayUserProfile(profileData) {
+    const userProfile = profileData.user;
+        if (userProfile) {
+            // Update the DOM with user profile data
+            const userNameElement = document.getElementById('user-name');
+            if (userNameElement) userNameElement.textContent = userProfile.name || '';
+            const userEmailElement = document.getElementById('user-email');
+            if (userEmailElement) userEmailElement.textContent = userProfile.email || '';
+            const userContactElement = document.getElementById('user-contact');
+            if (userContactElement) userContactElement.textContent = userProfile.contact || '';
+        } else {
+            // Display an error message if the user profile is not found
+            errorMessageContainer.textContent = 'User not found';
         }
+
+        const lostItemsContainer = document.getElementById('lost-items');
+        // Display lost items
+        const lostItems = profileData.lostItems;
+            lostItemsContainer.innerHTML = '<h2>Lost Items</h2>';
+            lostItems.forEach(item => {
+                lostItemsContainer.innerHTML += `
+                    <div>
+                        <p><strong>Name of Item Lost:</strong> ${item.name_of_item_lost}</p>
+                        <p><strong>Description:</strong> ${item.description}</p>
+                        <p><strong>Place:</strong> ${item.place}</p>
+                        <img src="${item.image}" alt="${item.name_of_item_lost}">
+                    </div>
+                `;
+            });
+
+        // Display found items
+        const foundItemsContainer = document.getElementById('found-items');
+        const foundItems = profileData.foundItems;
+            foundItemsContainer.innerHTML = '<h2>Found Items</h2>';
+            foundItems.forEach(item => {
+                foundItemsContainer.innerHTML += `
+                    <div>
+                        <p><strong>Name of Item Found:</strong> ${item.name_of_item_found}</p>
+                        <p><strong>Description:</strong> ${item.description}</p>
+                        <p><strong>Place:</strong> ${item.place}</p>
+                        <img src="${item.image}" alt="${item.name_of_item_found}">
+                    </div>
+                `;
+            });
+    }
+
+    async function deleteLostItem(itemId) {
+    try {
+        const response = await fetch(`/api/lost-items/${itemId}`, {
+            method: 'DELETE'
+        });
+        if (response.ok) {
+            console.log('Lost item deleted successfully');
+            // Implement logic to remove the item from the UI
+        } else {
+            console.error('Failed to delete lost item:', response.status);
+        }
+    } catch (error) {
+        console.error('Error deleting lost item:', error);
+    }
+}
+
+function removeLostItemFromUI(itemId) {
+    const lostItemElement = document.getElementById(itemId);
+    if (lostItemElement) {
+        lostItemElement.remove(); // Remove the item element from the DOM
+    } else {
+        console.error('Lost item element not found:', itemId);
+    }
+}
+
+        // Call fetchUserProfile function when the page loads
+        window.onload = fetchUserProfile;
 
       
     </script>
